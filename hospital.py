@@ -2,8 +2,19 @@
 import pygame
 
 
-SCR_WIDTH = 800
-SCR_HEIGHT = SCR_WIDTH
+
+layout = [
+     [0,0,0,0,0,0],
+     [0,0,0,0,0,0],
+     [0,0,0,0,0,0],
+     [0,0,0,0,0,0],
+     [0,0,0,0,0,0]
+]
+
+CELL_SIZE = 50
+SCR_WIDTH = len(layout[0]) * CELL_SIZE
+SCR_HEIGHT = len(layout) * CELL_SIZE
+
 
 # pygame setup
 pygame.init()
@@ -22,13 +33,13 @@ while running:
     screen.fill("white")
 
     # RENDER YOUR GAME HERE
-    num_lines = 10
     
-    for i in range(num_lines):
-            pygame.draw.line(screen, "black",(i*SCR_WIDTH/num_lines,0),(i*SCR_WIDTH/num_lines,SCR_HEIGHT),width=3)
-            pygame.draw.line(screen, "black",(0,i*SCR_HEIGHT/num_lines),(SCR_WIDTH, i*SCR_HEIGHT/num_lines) ,width=3)
+    #Create grid
+    for i in range(SCR_WIDTH//CELL_SIZE):
+            pygame.draw.line(screen, "black", (i*CELL_SIZE,0), (i*CELL_SIZE,SCR_HEIGHT),width=3)
+    for i in range(SCR_HEIGHT//CELL_SIZE):
+            pygame.draw.line(screen, "black", (0, i*CELL_SIZE), (SCR_WIDTH, i*CELL_SIZE),width=3)
 
-    pygame.draw.line(screen, "black",(0,0),(SCR_WIDTH,SCR_HEIGHT),width=3)
 
     # flip() the display to put your work on screen
     pygame.display.flip()
@@ -36,3 +47,6 @@ while running:
     clock.tick(60)  # limits FPS to 60
 
 pygame.quit()
+
+
+
