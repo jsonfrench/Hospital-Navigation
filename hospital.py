@@ -1,13 +1,18 @@
 # Example file showing a basic pygame "game loop"
 import pygame
+from dataclasses import dataclass
+
+@dataclass
+class Player:
+     medicine: int = 0
 
 layout = [
-     [0,0,0,0,0,0],
+     [0,2,0,0,2,0],
      [0,1,0,1,0,0],
      [0,0,0,1,1,0],
-     [1,0,0,1,0,0],
+     [1,0,0,1,2,0],
      [0,0,0,0,0,0],
-     [0,0,1,1,1,1]
+     [3,0,1,1,1,1]
 ]
 
 def draw_grid():
@@ -24,14 +29,18 @@ def draw_state():
             color = "white"
             if(col == 1):
                     color = "black"
+            elif(col == 2):
+                    color = "green"
+            elif(col == 3):
+                    color = "purple"
             pygame.draw.rect(screen, color, pygame.Rect(start_y*CELL_SIZE, start_x*CELL_SIZE, CELL_SIZE, CELL_SIZE))
             start_y += 1
         start_x += 1
 
 def is_valid_location(position):
-     if not 0 <= position[0] < len(layout[0]) :
+     if not 0 <= position[0] < len(layout[0]):
           return False
-     if not 0 <= position[1] < len(layout) :
+     if not 0 <= position[1] < len(layout):
           return False
      if layout[position[1]][position[0]] == 1:
           return False
@@ -43,6 +52,8 @@ SCR_HEIGHT = len(layout) * CELL_SIZE
 
 player_x = 0
 player_y = 0
+
+player = Player()
 
 # pygame setup
 pygame.init()
@@ -69,6 +80,14 @@ while running:
                 desired_player_y += 1
             if event.key == pygame.K_d:
                 desired_player_x += 1
+            if event.key == pygame.K_SPACE:
+                if layout[player_y][player_x] == 2:
+                    layout[player_y][player_x] = 0
+                    player.medicine += 1
+                elif layout[player_y][player_x] == 3:
+                    player.medicine = 0
+                    print("Delivered medicine!")
+                print("Medicine:", player.medicine)
     if is_valid_location((desired_player_x, desired_player_y)):
          player_x = desired_player_x
          player_y = desired_player_y
