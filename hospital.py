@@ -1,26 +1,38 @@
-# Example file showing a basic pygame "game loop"
+#Boilerplate code gotten from https://www.pygame.org/docs/
 import pygame
 from dataclasses import dataclass
 
+#Struct that holds player data (amount of medicine)
 @dataclass
 class Player:
      medicine: int = 0
 
+#Defines map of tiles
+#1 = wall
+#2 = medicine
+#3 = delivery point
 layout = [
-     [0,2,0,0,2,0],
-     [0,1,0,1,0,0],
-     [0,0,0,1,1,0],
-     [1,0,0,1,2,0],
-     [0,0,0,0,0,0],
-     [3,0,1,1,1,1]
+     [0,2,0,0,0,0,0,0,0,0,2],
+     [0,0,0,0,0,0,1,0,1,1,1],
+     [0,0,0,0,1,0,1,0,0,2,0],
+     [0,0,0,0,1,0,1,0,0,0,0],
+     [0,0,0,0,2,0,0,0,0,0,0],
+     [0,1,1,1,0,0,0,1,1,1,0],
+     [0,1,0,0,0,0,1,1,0,0,0],
+     [0,1,0,0,0,0,1,1,0,0,0],
+     [0,1,0,0,1,0,0,0,0,0,3]
 ]
 
+#----------Functions----------#
+
+#Draws a grid on the screen
 def draw_grid():
     for i in range(SCR_WIDTH//CELL_SIZE):
             pygame.draw.line(screen, "black", (i*CELL_SIZE,0), (i*CELL_SIZE,SCR_HEIGHT),width=3)
     for i in range(SCR_HEIGHT//CELL_SIZE):
             pygame.draw.line(screen, "black", (0, i*CELL_SIZE), (SCR_WIDTH, i*CELL_SIZE),width=3)
 
+#Fills in the color of each tile
 def draw_state():
     start_x = 0
     for row in layout:
@@ -37,6 +49,29 @@ def draw_state():
             start_y += 1
         start_x += 1
 
+#Draws player onto the board
+def draw_player():
+    pygame.draw.circle(screen, "red", (player_x*CELL_SIZE+CELL_SIZE/2,player_y*CELL_SIZE+CELL_SIZE/2),CELL_SIZE*.9/2)
+
+#Returns a list of tuples containing the coordinates of every tile of specified type
+def get_tile(type):
+    wall_locations = []
+    for row in range(len(layout)):
+        for col in range(len(layout[row])):
+            if layout[row][col] == type:
+                wall_locations.append((col, row))
+    return wall_locations
+
+#Returns locations of tiles, players, and amount of medicine
+def get_state():
+    state=[]
+    for x in range(1,4):
+        state.append(get_tile(x))
+    state.append((player_x,player_y))
+    state.append(player.medicine)
+    return(state)
+
+#Collision detection
 def is_valid_location(position):
      if not 0 <= position[0] < len(layout[0]):
           return False
@@ -46,6 +81,7 @@ def is_valid_location(position):
           return False
      return True
 
+#----------Constants----------#
 CELL_SIZE = 50
 SCR_WIDTH = len(layout[0]) * CELL_SIZE
 SCR_HEIGHT = len(layout) * CELL_SIZE
@@ -55,32 +91,32 @@ player_y = 0
 
 player = Player()
 
-# pygame setup
+#Pygame setup (more boilerplate)
 pygame.init()
 screen = pygame.display.set_mode((SCR_WIDTH, SCR_HEIGHT))
 clock = pygame.time.Clock()
 running = True
 
+#----------Game loop----------#
+
 while running:
-    # poll for events
-    # pygame.QUIT event means the user clicked X to close your window
-    
+
     #Handle input
     desired_player_x = player_x
     desired_player_y = player_y
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        if event.type == pygame.QUIT:   #pygame.QUIT event means the user clicked X to close your window
             running = False
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_w:
+            if event.key == pygame.K_w: #move up
                 desired_player_y -= 1
-            if event.key == pygame.K_a:
+            if event.key == pygame.K_a: #move left
                 desired_player_x -= 1
-            if event.key == pygame.K_s:
+            if event.key == pygame.K_s: #move down
                 desired_player_y += 1
-            if event.key == pygame.K_d:
+            if event.key == pygame.K_d: #move right
                 desired_player_x += 1
-            if event.key == pygame.K_SPACE:
+            if event.key == pygame.K_SPACE: #pickup/dropoff medicine
                 if layout[player_y][player_x] == 2:
                     layout[player_y][player_x] = 0
                     player.medicine += 1
@@ -88,6 +124,8 @@ while running:
                     player.medicine = 0
                     print("Delivered medicine!")
                 print("Medicine:", player.medicine)
+            if event.key == pygame.K_e: #get state (debuggine)
+                print(get_state())
     if is_valid_location((desired_player_x, desired_player_y)):
          player_x = desired_player_x
          player_y = desired_player_y
@@ -98,9 +136,7 @@ while running:
     # RENDER YOUR GAME HERE
     draw_state()
     draw_grid()
-
-    #Draw player
-    pygame.draw.circle(screen, "red", (player_x*CELL_SIZE+CELL_SIZE/2,player_y*CELL_SIZE+CELL_SIZE/2),CELL_SIZE*.9/2)
+    draw_player()
 
     # flip() the display to put your work on screen
     pygame.display.flip()
