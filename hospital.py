@@ -6,6 +6,7 @@ from dataclasses import dataclass
 @dataclass
 class Player:
      medicine: int = 0
+     delivered: int = 0
 
 #Defines map of tiles
 #1 = wall
@@ -48,6 +49,7 @@ def draw_state():
             pygame.draw.rect(screen, color, pygame.Rect(start_y*CELL_SIZE, start_x*CELL_SIZE, CELL_SIZE, CELL_SIZE))
             start_y += 1
         start_x += 1
+        draw_player()
 
 #Draws player onto the board
 def draw_player():
@@ -69,6 +71,7 @@ def get_state():
         state.append(get_tile(x))
     state.append((player_x,player_y))
     state.append(player.medicine)
+    state.append(player.delivered)
     return(state)
 
 #Collision detection
@@ -121,11 +124,19 @@ while running:
                     layout[player_y][player_x] = 0
                     player.medicine += 1
                 elif layout[player_y][player_x] == 3:
+                    player.delivered += player.medicine
                     player.medicine = 0
                     print("Delivered medicine!")
                 print("Medicine:", player.medicine)
             if event.key == pygame.K_e: #get state (debuggine)
                 print(get_state())
+        if event.type == pygame.MOUSEBUTTONDOWN:    #Click a square to build a wall 
+            mouse_x, mouse_y = event.pos            #Click a wall to knock it down
+            mouse_x //= CELL_SIZE
+            mouse_y //= CELL_SIZE
+            print((mouse_x,mouse_y))
+            layout[mouse_y][mouse_x] = 1 if layout[mouse_y][mouse_x] == 0 else 0
+
     if is_valid_location((desired_player_x, desired_player_y)):
          player_x = desired_player_x
          player_y = desired_player_y
@@ -136,7 +147,6 @@ while running:
     # RENDER YOUR GAME HERE
     draw_state()
     draw_grid()
-    draw_player()
 
     # flip() the display to put your work on screen
     pygame.display.flip()
