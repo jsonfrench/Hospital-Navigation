@@ -134,7 +134,6 @@ while running:
             mouse_x, mouse_y = event.pos            #Click a wall to knock it down
             mouse_x //= CELL_SIZE
             mouse_y //= CELL_SIZE
-            print((mouse_x,mouse_y))
             layout[mouse_y][mouse_x] = 1 if layout[mouse_y][mouse_x] == 0 else 0
 
     if is_valid_location((desired_player_x, desired_player_y)):

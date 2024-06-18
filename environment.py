@@ -4,7 +4,6 @@ import numpy as np
 import pygame
 from dataclasses import dataclass
 
-# Struct that holds player data (amount of medicine)
 @dataclass
 class Player:
     medicine: int = 0
@@ -130,4 +129,18 @@ class MedicineEnv(gym.Env):
             start_x += 1
         pygame.draw.circle(screen, "red", (self.player_x * self.cell_size + self.cell_size / 2, self.player_y * self.cell_size + self.cell_size / 2), self.cell_size * 0.9 / 2)
 
-env = MedicineEnv()
+    def seed(self, seed=None):
+        np.random.seed(seed)
+
+    def close(self):
+        pygame.quit()
+
+    def render(self, mode='human'):
+        # Pygame rendering code
+        if mode == 'human':
+            screen.fill("white")
+            self.draw_state()
+            self.draw_grid()
+            pygame.display.flip()
+            clock.tick(60)
+
